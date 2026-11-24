@@ -250,14 +250,14 @@ function gemsHtml(all, dateValue, shown = new Set()) {
         <h2 id="gems-title" class="section-title">숨은 명소 ${gems.length}곳</h2>
         <p class="section-sub">아직 소문 안 난 명당</p>
       </div>
-      <!-- 큰 카드 하나(두 칸 두 줄) + 글자 카드 최대 4개(또는 8개). 카드가 1~3개인 날도 빈 칸이 남지 않게 개수를 클래스로 (n1~n4) -->
-      <div class="bento n${Math.min(cards.length, 4)} stagger">
+      <!-- 맨 위 가로 띠 하나 + 작은 카드 최대 4개(또는 8개). 카드 칸은 개수만큼 나눠 써서 빈 칸이 없음 -->
+      <div class="bento stagger">
         <a class="feature on-dark" href="${placeHref(feature.place, dateValue)}">
           <span class="feature-top">${gemBadgeHtml()}${feature.crowd.level ? crowdBadgeHtml(feature.crowd) : ""}</span>
           <span class="feature-bottom"><strong>${escapeHtml(feature.place.name)}</strong><span>${escapeHtml(placeSummary(feature.place))}</span></span>
           <span class="feature-facts">${facts}</span>
         </a>
-        ${cards.map((i) => placeCardHtml(i, dateValue)).join("")}
+        ${cards.length ? `<div class="bento-cards">${cards.map((i) => placeCardHtml(i, dateValue)).join("")}</div>` : ""}
       </div>
       <button type="button" class="more-link" data-all-gems>숨은 명소 다 보기</button>
     </section>`;

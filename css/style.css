@@ -275,7 +275,7 @@ html:not(.motion) .hot-bar::after { transform: none; }
 /* 큰 카드 아래 전광판: 왜 숨은 명소인지 보여 주는 실제 숫자 (2026-11-24, 큰 카드가 비어 보인다는 피드백) */
 .feature-facts { display: flex; flex-wrap: wrap; gap: 14px 40px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(244, 246, 245, 0.22); }
 .fact { display: flex; flex-direction: column; gap: 6px; }
-.fact .num { font-size: 36px; color: var(--paper); }
+.fact .num { font-size: 36px; color: var(--paper); white-space: nowrap; }
 .fact > span:last-child { font-size: 14px; color: var(--on-hull-2); }
 .feature-bottom strong { font-size: 24px; }
 .feature-bottom span { font-size: 15px; color: var(--on-hull-2); }
@@ -296,15 +296,27 @@ html:not(.motion) .hot-bar::after { transform: none; }
 .card-title { font-size: 18px; line-height: 1.3; }
 .card-hook { font-size: 15px; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* 숨은 명소: 큰 카드 하나(2칸 × 2줄) + 사진 카드. 격자 한 장이라 위아래 선이 저절로 맞음 */
-.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 24px; }
-.bento .feature { grid-column: span 2; grid-row: span 2; min-height: 0; }
+/* 숨은 명소: 맨 위 가로 띠 하나(이름·소개 왼쪽, 숫자 오른쪽) + 아래 작은 카드 한 줄
+   예전 2칸 × 2줄 큰 카드는 화면을 너무 크게 차지했음 ("조양동 선사유적지 파랑카드 ㅈㄴ크게뜨는것도 불편함", 2026-11-24)
+   작은 카드는 개수만큼 칸을 나눠 써서 1~4개 어느 날도 빈 칸이 없음 */
+.bento { display: flex; flex-direction: column; gap: 20px; }
+.bento-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px; }
+.bento .feature {
+  min-height: 0; padding: 26px 32px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "top top" "name facts"; align-items: end; gap: 14px 48px;
+}
+.bento .feature-top { grid-area: top; }
+.bento .feature-bottom { grid-area: name; margin-top: 0; padding-top: 0; }
+.bento .feature-facts { grid-area: facts; margin-top: 0; padding: 0 0 0 32px; border-top: 0; border-left: 1px solid rgba(244, 246, 245, 0.22); flex-wrap: nowrap; }
 .bento .feature-bottom strong { font-size: 30px; }
-.bento .feature-bottom span { font-size: 15px; max-width: 44ch; }
-/* 작은 카드가 1~3개인 날: 오른쪽 2칸 × 2줄을 빈 칸 없이 채움 (11/28처럼 숨은 명소가 적은 날 오른쪽 아래가 비던 문제) */
-.bento.n3 > .card:last-child, .bento.n2 > .card, .bento.n1 > .card { grid-column: span 2; }
-.bento.n1 > .card { grid-row: span 2; }
-.bento.n0 > .feature { grid-column: 1 / -1; grid-row: auto; min-height: 300px; }
+.bento .feature-bottom span { font-size: 15px; max-width: 52ch; }
+@media (max-width: 760px) {
+  .bento .feature { grid-template-columns: 1fr; grid-template-areas: "top" "name" "facts"; padding: 22px; gap: 12px; }
+  .bento .feature-bottom strong { font-size: 24px; }
+  .bento .feature-facts { padding: 14px 0 0; border-left: 0; border-top: 1px solid rgba(244, 246, 245, 0.22); gap: 24px; }
+  .bento .fact .num { font-size: 28px; }
+  .bento .fact > span:last-child { font-size: 13px; }
+}
 
 /* ── 이 앱의 핵심: 여기 사람 많으면 여기로 ── */
 .board { padding: 56px var(--gutter); }
@@ -510,9 +522,6 @@ html:not(.motion) .hot-bar::after { transform: none; }
   .split { grid-template-columns: 1fr; gap: 32px; }
   .hot-list { grid-template-columns: 1fr; }
   .taste-list { grid-template-columns: 1fr; }
-  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
-  .bento .feature { grid-row: auto; min-height: 300px; }
-  .bento.n1 > .card { grid-row: auto; }
   .date-field span { display: none; }
   .topbar-right { gap: 12px; font-size: 14px; }
   .brand { font-size: 22px; }
