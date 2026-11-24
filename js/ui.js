@@ -61,7 +61,7 @@ function placeCardHtml(item, dateValue) {
       <span class="card-eyebrow">${escapeHtml(place.tags.map(tagShort).join(" · "))}</span>
       <strong class="card-title">${escapeHtml(place.name)}</strong>
       ${summary ? `<span class="card-hook">${escapeHtml(summary)}</span>` : ""}
-      <span class="card-foot">${crowdOrPopBadgeHtml(item)}<span class="card-go" aria-hidden="true">→</span></span>
+      <span class="card-foot">${crowdOrPopBadgeHtml(item)}<svg class="card-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
     </a>`;
 }
 

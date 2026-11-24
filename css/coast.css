@@ -33,13 +33,15 @@
 .coast .hero-lead { margin-top: 10px; color: inherit; text-shadow: none; }
 .coast-sea { position: absolute; inset: 0; z-index: -1; background: var(--ink); }
 .coast #sea { z-index: 0; }
+/* 바다 위 막: 글자가 읽히는 만큼만 (62%면 바다가 안 보이고 검은 덩어리처럼 보였음, 2026-11-24 → 28%) */
 .coast-sea::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--ink) 62%, transparent);
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
   pointer-events: none;
 }
+.coast .hero-lead { text-shadow: 0 1px 12px rgba(14, 23, 38, 0.55); } /* 달빛 반사 위에서도 읽히게 */
 .coast .chat {
   margin-top: 28px;
   background: var(--paper);
@@ -82,9 +84,6 @@
 @media (min-width: 1360px) {
   .swaps > .swap:last-child:nth-child(odd):not(:only-child) { grid-column: 1 / -1; grid-template-columns: minmax(0, 0.75fr) 48px minmax(0, 4.2fr); }
 }
-/* 숨은 명소 큰 카드: 점 무늬 대신 위 카드와 같은 막대로 그날 예측을 보여 준다 */
-.feature-meter { margin-top: 14px; max-width: 320px; background: color-mix(in srgb, var(--paper) 22%, var(--hull)); }
-.feature-meter span { background: var(--paper); }
 @media (max-width: 700px) {
   .swap-busy { flex-wrap: wrap; row-gap: 12px; }
   .swap-meter { flex-basis: 100%; }

@@ -236,19 +236,28 @@ function gemsHtml(all, dateValue, shown = new Set()) {
   if (!ordered.length) return "";
   const feature = ordered[0];
   const rest = ordered.slice(1);
+  const cards = rest.slice(0, rest.length >= 8 ? 8 : 4);
+  // 큰 카드 아래 전광판: 이 곳이 왜 숨은 명소인지 보여 주는 실제 숫자만 (길찾기 순위 · 그날 예측 · SNS)
+  const fp = feature.pop.percentile;
+  const facts = [
+    `<span class="fact"><span class="num">하위 ${Math.max(1, Math.round(fp * 100))}%</span><span>길찾기로 찾는 순위</span></span>`,
+    feature.crowd.level ? `<span class="fact"><span class="num" data-count="${feature.crowd.rate}">${feature.crowd.rate}</span><span>${formatYmd(toYmd(state.date))} 혼잡 예측</span></span>` : "",
+    feature.buzz !== null && feature.buzz !== undefined ? `<span class="fact"><span class="num">${feature.buzz}개</span><span>SNS 게시물</span></span>` : "",
+  ].filter(Boolean).join("");
   return `
     <section class="sec" aria-labelledby="gems-title">
       <div class="section-head reveal">
         <h2 id="gems-title" class="section-title">숨은 명소 ${gems.length}곳</h2>
         <p class="section-sub">아직 소문 안 난 명당</p>
       </div>
-      <!-- 큰 카드 하나(두 칸 두 줄) + 글자 카드 4개씩. 격자라 위아래 선이 저절로 맞음 -->
-      <div class="bento stagger">
+      <!-- 큰 카드 하나(두 칸 두 줄) + 글자 카드 최대 4개(또는 8개). 카드가 1~3개인 날도 빈 칸이 남지 않게 개수를 클래스로 (n1~n4) -->
+      <div class="bento n${Math.min(cards.length, 4)} stagger">
         <a class="feature on-dark" href="${placeHref(feature.place, dateValue)}">
-          <span class="feature-top">${gemBadgeHtml()}${feature.crowd.level ? `<span class="feature-rate"><span class="num" data-count="${feature.crowd.rate}">${feature.crowd.rate}</span>${crowdBadgeHtml(feature.crowd)}</span>` : ""}</span>
-          <span class="feature-bottom"><strong>${escapeHtml(feature.place.name)}</strong><span>${escapeHtml(placeSummary(feature.place))}</span>${feature.crowd.level ? `<span class="swap-meter feature-meter" aria-hidden="true"><span style="width:${feature.crowd.rate}%"></span></span>` : ""}</span>
+          <span class="feature-top">${gemBadgeHtml()}${feature.crowd.level ? crowdBadgeHtml(feature.crowd) : ""}</span>
+          <span class="feature-bottom"><strong>${escapeHtml(feature.place.name)}</strong><span>${escapeHtml(placeSummary(feature.place))}</span></span>
+          <span class="feature-facts">${facts}</span>
         </a>
-        ${rest.slice(0, rest.length >= 8 ? 8 : 4).map((i) => placeCardHtml(i, dateValue)).join("")}
+        ${cards.map((i) => placeCardHtml(i, dateValue)).join("")}
       </div>
       <button type="button" class="more-link" data-all-gems>숨은 명소 다 보기</button>
     </section>`;
