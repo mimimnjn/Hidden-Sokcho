@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>숨은 속초</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Black+Han+Sans&family=Gothic+A1:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/coast.css">
+</head>
+<body class="page-home">
+  <header class="topbar">
+    <a class="brand" href="index.html">숨은 속초</a>
+    <div class="topbar-right">
+      <label class="date-field">
+        <span>방문 날짜</span>
+        <input type="date" id="visit-date" aria-label="방문 날짜">
+      </label>
+      <span id="weather" class="weather" hidden></span>
+    </div>
+  </header>
+
+  <!-- 첫 화면: 둥근 칸 안의 바다 위에 제목, 그 아래 긴 대화 바 (친구 eon의 해안 시안). 대화는 첫 질문 뒤에만 바 위로 펼쳐짐 (js/chat.js) -->
+  <section class="hero coast" aria-labelledby="coast-title">
+    <div class="hero-inner">
+      <div class="coast-intro">
+        <div class="coast-copy">
+          <h1 id="coast-title" class="hero-title">숨은 속초</h1>
+          <p class="hero-lead">뻔한 속초 여행은 이제 그만<br>네 취향대로 골라봐</p>
+        </div>
+        <!-- 해 진 직후 동해를 실시간으로 그리는 바다 (js/sea.js, WebGL). 안 되는 기기에서는 먹색 바탕만 보임 -->
+        <div class="coast-sea" aria-hidden="true">
+          <canvas id="sea" data-mode="night"></canvas>
+        </div>
+      </div>
+      <div class="chat">
+        <div id="chat-log" class="chat-log" aria-live="polite" hidden></div>
+        <form id="chat-form" class="chat-form">
+          <label class="sr-only" for="search">하고 싶은 여행 말하기</label>
+          <input type="text" id="search" autocomplete="off" placeholder="어떤 여행 좋아해">
+          <button type="submit" class="chat-send" aria-label="보내기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+        </form>
+      </div>
+      <div id="tag-chips" class="chips" role="group" aria-label="취향으로 물어보기"></div>
+      <aside id="hero-stats" class="hero-stats stagger" aria-label="오늘의 속초"></aside>
+    </div>
+  </section>
+
+  <!-- 첫 화면 -->
+  <main id="home"></main>
+
+  <!-- 취향을 고르거나 검색하면 -->
+  <main id="results" class="wrap results" hidden>
+    <div class="results-head">
+      <h2 id="result-count" class="section-title"></h2>
+      <div class="sort" role="radiogroup" aria-label="정렬">
+        <button type="button" class="sort-btn" data-mode="taste" role="radio">취향 우선</button>
+        <button type="button" class="sort-btn" data-mode="gem" role="radio">숨은 명소 우선</button>
+      </div>
+    </div>
+    <div id="result-filters" class="filters" role="group" aria-label="취향 거르기"></div>
+    <ul id="place-grid" class="grid"></ul>
+    <p id="empty" class="empty" hidden>찾는 곳 없음<br>다른 이름으로 다시</p>
+    <button type="button" id="more" class="btn-line" hidden>더 보기</button>
+  </main>
+
+  <footer class="footer">
+    <!-- 공공누리 출처 표시(한국관광공사·기상청)와 데이터 정직성(실시간 아님)만 한 줄로 남김. 2026-11-24 출처 줄 정리 -->
+    <p>한국관광공사 · 기상청 공공데이터 · 실시간이 아닌 예측 · 혼잡 예측은 <span id="date-range"></span>까지</p>
+  </footer>
+
+  <script src="data/tags.js"></script>
+  <script src="data/places.js"></script>
+  <script src="data/auto-places.js"></script>
+  <script src="data/crowd-data.js"></script>
+  <script src="data/popular.js"></script>
+  <script src="data/tour-data.js"></script>
+  <script src="data/descriptions.js"></script>
+  <script src="data/sns-data.js"></script>
+  <script src="data/weather-data.js"></script>
+  <script src="js/places-all.js"></script>
+  <script src="js/crowd.js"></script>
+  <script src="js/recommend.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/sea.js"></script>
+</body>
+</html>

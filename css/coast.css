@@ -1,0 +1,99 @@
+/* 해안 시안의 수평선과 검색대를 원본 앱의 색과 글꼴로 구성한다 */
+.coast {
+  padding: 40px var(--gutter) 32px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.coast::before { content: none; }
+/* 바다 칸은 아래 섹션들과 같은 폭(--content)을 쓰고, 대화 바만 가운데 좁게 (2026-11-24)
+   바다 칸 높이를 줄여서 PC 첫 화면(1440×900)에 "여기 사람 많으면 여기로" 제목까지 보이게 함 */
+.coast .hero-inner { max-width: none; }
+.coast .chat { max-width: 880px; }
+.coast-intro {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: clamp(220px, 20vw, 288px);
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--hull);
+}
+.coast-copy {
+  padding: 48px 20px;
+  color: var(--paper);
+  text-align: center;
+}
+.coast .hero-title {
+  color: inherit;
+  font-size: clamp(72px, 9vw, 132px);
+  text-shadow: none;
+}
+.coast .hero-lead { margin-top: 10px; color: inherit; text-shadow: none; }
+.coast-sea { position: absolute; inset: 0; z-index: -1; background: var(--ink); }
+.coast #sea { z-index: 0; }
+.coast-sea::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--ink) 62%, transparent);
+  pointer-events: none;
+}
+.coast .chat {
+  margin-top: 28px;
+  background: var(--paper);
+  border: 1px solid var(--hull);
+  box-shadow: none;
+}
+.coast .chat:focus-within { outline: 2px solid var(--hull); outline-offset: 2px; }
+.coast .chat-send { background: var(--hull); }
+.coast .chip {
+  background: var(--foam);
+  color: var(--hull);
+  border-color: transparent;
+  backdrop-filter: none;
+}
+.coast .chip:hover, .coast .chip.on { color: var(--paper); background: var(--hull); }
+.coast :focus-visible { outline-color: var(--hull); }
+.coast .hero-stats { border-color: var(--line); margin-top: 28px; }
+.coast .stat-label span { color: var(--ink-2); }
+.coast .stat-busy .num { color: var(--signal); }
+
+/* 사람 몰리는 카드: 점 무늬 없이, 그날 예측(최대 방문일 대비 %)을 아래 막대로 보여 준다 */
+.swap-meter { display: block; height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--signal) 16%, var(--paper)); overflow: hidden; }
+.swap-meter span { display: block; height: 100%; border-radius: inherit; background: var(--signal); }
+/* 밝은 톤: 먹색 대신 빨강을 아주 묽힌 바탕 (새 색이 아니라 --signal과 --paper를 섞은 것) */
+.swap-busy {
+  background: color-mix(in srgb, var(--signal) 9%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--signal) 22%, var(--paper));
+  color: var(--ink);
+}
+.swap-busy:hover { color: var(--ink); border-color: var(--signal); }
+.swap-busy-name .num { color: var(--signal); }
+.swap-alt { display: flex; align-items: center; box-shadow: none; border: 1px solid var(--line); }
+.swap-alt:hover { box-shadow: none; border-color: var(--hull); }
+.swap-body { padding: 24px; gap: 8px; }
+.swap-rate { margin-top: 0; padding-top: 6px; }
+@media (min-width: 701px) {
+  .swap { min-height: 168px; }
+}
+/* 두 줄로 놓일 때 홀수 개면 마지막 카드가 반쪽만 차지하지 않게 한 줄을 다 쓴다 */
+@media (min-width: 1360px) {
+  .swaps > .swap:last-child:nth-child(odd):not(:only-child) { grid-column: 1 / -1; grid-template-columns: minmax(0, 0.75fr) 48px minmax(0, 4.2fr); }
+}
+/* 숨은 명소 큰 카드: 점 무늬 대신 위 카드와 같은 막대로 그날 예측을 보여 준다 */
+.feature-meter { margin-top: 14px; max-width: 320px; background: color-mix(in srgb, var(--paper) 22%, var(--hull)); }
+.feature-meter span { background: var(--paper); }
+@media (max-width: 700px) {
+  .swap-busy { flex-wrap: wrap; row-gap: 12px; }
+  .swap-meter { flex-basis: 100%; }
+}
+
+/* 첫 화면만: 넓은 화면에서 윗줄·바다 칸·섹션·아랫줄의 좌우 선을 --content 폭 한 줄에 맞춤
+   (예전에는 바다 칸만 가운데 1080px이고 섹션은 화면 끝 48px에서 시작해서 선이 어긋났음, 2026-11-24) */
+.page-home .topbar, .page-home .coast, .page-home .board, .page-home .sec,
+.page-home .taste, .page-home .results, .page-home .footer {
+  padding-left: max(var(--gutter), calc((100% - var(--content)) / 2));
+  padding-right: max(var(--gutter), calc((100% - var(--content)) / 2));
+}

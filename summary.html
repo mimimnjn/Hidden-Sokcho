@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>속초 관광 쏠림 요약 · 숨은 속초</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Black+Han+Sans&family=Gothic+A1:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="page page-wide">
+    <a class="back" href="index.html">← 추천 화면으로</a>
+    <header class="header">
+      <h1 class="logo">속초 관광 쏠림</h1>
+      <p class="intro">어디에 언제 몰리나 · 어디로 돌리나</p>
+    </header>
+
+    <section class="section panel">
+      <h2 class="section-title">유명한 곳 쏠림</h2>
+      <p class="share"><span id="hero-share" class="hero-number"></span></p>
+      <p id="hero-caption" class="muted"></p>
+    </section>
+
+    <section class="section panel">
+      <h2 class="section-title">월별 방문자</h2>
+      <p id="monthly-caption" class="muted"></p>
+      <div id="monthly-chart" class="chart"></div>
+      <details class="table-view">
+        <summary>표로 보기</summary>
+        <table id="monthly-table"></table>
+      </details>
+    </section>
+
+    <section class="section panel">
+      <h2 class="section-title">요일별 방문자</h2>
+      <p id="weekday-caption" class="muted"></p>
+      <div id="weekday-chart" class="chart"></div>
+      <details class="table-view">
+        <summary>표로 보기</summary>
+        <table id="weekday-table"></table>
+      </details>
+    </section>
+
+    <section class="section panel">
+      <h2 class="section-title">먼저 보여주는 곳</h2>
+      <p class="muted">관광지끼리 비교 · 오른쪽은 숨은 명소 우선 첫 5곳</p>
+      <div class="compare">
+        <div>
+          <h3 class="compare-title">길찾기로 가장 많이 찾는 5곳</h3>
+          <ol id="famous-list" class="compare-list"></ol>
+        </div>
+        <div>
+          <h3 class="compare-title">숨은 속초 추천 첫 5곳</h3>
+          <ul id="recommended-list" class="compare-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      한국관광공사 공공데이터 · <span id="summary-generated"></span>
+    </footer>
+  </main>
+
+  <script src="data/tags.js"></script>
+  <script src="data/places.js"></script>
+  <script src="data/auto-places.js"></script>
+  <script src="data/crowd-data.js"></script>
+  <script src="data/tour-data.js"></script>
+  <script src="data/descriptions.js"></script>
+  <script src="data/sns-data.js"></script>
+  <script src="data/weather-data.js"></script>
+  <script src="js/places-all.js"></script>
+  <script src="data/visitor-data.js"></script>
+  <script src="js/crowd.js"></script>
+  <script src="js/recommend.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/summary.js"></script>
+</body>
+</html>
