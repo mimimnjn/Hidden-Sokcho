@@ -1,6 +1,8 @@
 // 첫 화면 대화창 (Design 캔버스 "대화형" 시안 H2를 앱에 옮김, 2026-10-06)
-// 아직 AI 모델도 MCP도 없음. 말 속 단어로 취향을 알아듣는 규칙이고, 유료 API는 쓰지 않음
-// 나중에 직접 학습한 취향 모델이 생기면 understand()만 바꾸면 됨 (docs/direction.md 7단계)
+// 말을 알아듣는 방법 두 가지를 합친다 (2026-11-26). 둘 다 브라우저 안에서 돌고 유료 API는 쓰지 않음
+// - 단어 규칙 understandRules(): 사람이 정한 단어 목록
+// - 취향 모델 predictTaste(): 문장으로 직접 학습한 나이브 베이즈 (js/taste-model.js, data/taste-model.js)
+// MCP와는 별개다. MCP는 Claude 같은 AI 앱이 이 데이터를 쓰게 하는 연결 통로 (mcp/server.js)
 
 // ── 1. 말 알아듣기 (화면과 상관없는 순수 함수라 테스트 가능) ──
 const TASTE_WORDS = {
@@ -23,8 +25,19 @@ const SPECIFIC = /물회|닭강정|순두부|막국수|해장국|국밥|대게|�
 const BOOST_FOR = { "바다": /바다|오션|뷰|해변|해안/ }; // "바다 보이는 카페"처럼 먹거리·카페와 같이 말한 취향
 const chatNorm = (s) => String(s).replace(/\s|\[.*?\]/g, "").toLowerCase();
 
-// 문장 → { tags, quiet, indoor, viral, places }. places: 이름이 맞는 장소 (취향 단어가 없을 때만)
+// 문장 → 알아들은 것. 단어 규칙 + 취향 모델 (모델 파일이 없으면 규칙만)
+// ai: 모델 판단 그대로 · fromModel: 규칙은 못 알아듣고 모델이 더한 라벨 (화면 AI 표시, MCP 답)
 function understand(text, places) {
+  const rules = understandRules(text, places);
+  if (typeof predictTaste !== "function" || typeof TASTE_MODEL === "undefined") return { ...rules, fromModel: [] };
+  const ai = predictTaste(text);
+  const m = mergeTaste(rules, ai, TASTE_MODEL.settings.mode);
+  const fromModel = [...m.tags.filter((t) => !rules.tags.includes(t)), ...TASTE_MOODS.filter((k) => m[k] && !rules[k])];
+  return { ...m, ai, fromModel };
+}
+
+// 단어 규칙: 문장 → { tags, quiet, indoor, viral, places }. places: 이름이 맞는 장소 (취향 단어가 없을 때만)
+function understandRules(text, places) {
   const tags = Object.keys(TASTE_WORDS).filter((t) => TASTE_WORDS[t].test(text));
   const out = {
     tags, quiet: MOOD_WORDS.quiet.test(text), indoor: MOOD_WORDS.indoor.test(text), viral: MOOD_WORDS.viral.test(text),
@@ -109,10 +122,15 @@ if (typeof document !== "undefined" && document.getElementById("chat-form")) {
     }
     const { tags, picks, skipped } = answer(m, ALL_PLACES, state.date);
     if (!tags.length) return say("bot", "<p>음 잘 모르겠어<br>바다 · 산책 · 맛집 · 카페 같은 말로 다시 해 줘</p>");
-    const heard = [...m.tags.map(tagLabel), ...(m.quiet ? ["한적한 곳"] : []), ...(m.indoor ? ["실내"] : []), ...(m.viral ? ["SNS 핫플"] : [])];
+    // 알아들은 말 칩. 단어 규칙은 못 알아듣고 취향 모델이 알아들은 것에는 AI 표시 (확률은 마우스를 올리면)
+    const chip = (label, key) => m.fromModel.includes(key)
+      ? `<span class="heard heard-ai" title="직접 학습한 취향 모델이 알아들음 · 확률 ${Math.round(m.ai.scores[key] * 100)}%">${escapeHtml(label)}<b>AI</b></span>`
+      : `<span class="heard">${escapeHtml(label)}</span>`;
+    const moods = [["quiet", "한적한 곳"], ["indoor", "실내"], ["viral", "SNS 핫플"]].filter(([k]) => m[k]);
+    const heard = [...m.tags.map((t) => chip(tagLabel(t), t)), ...moods.map(([k, label]) => chip(label, k))];
     if (!picks.length) return say("bot", `<p>${day}엔 딱 맞는 데가 없어<br>날짜를 바꿔 보거나 다르게 말해 줘</p>`);
     say("bot", `
-      <p class="msg-heard">${heard.map((h) => `<span class="heard">${escapeHtml(h)}</span>`).join("")}<span>${day} 이런 데 어때</span></p>
+      <p class="msg-heard">${heard.join("")}<span>${day} 이런 데 어때</span></p>
       <ul class="rows chat-rows">${picks.map((i) => placeRowHtml(i, dateValue)).join("")}</ul>
       ${skipped.length ? `<p class="msg-note">${skipped.map(escapeHtml).join(" · ")}${josaEunNeun(skipped[skipped.length - 1])} 이날 사람 많아서 뺐어</p>` : ""}
       <button type="button" class="more-link" data-chat-all="${escapeHtml(tags.join(","))}" data-quiet="${m.quiet ? 1 : ""}" data-indoor="${m.indoor ? 1 : ""}" data-words="${escapeHtml(m.words.join(","))}">더 보기</button>`);

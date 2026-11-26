@@ -1,0 +1,42 @@
+{
+  "method": "5겹 교차 검증 · 학습 문장 191개 · 설정 972가지",
+  "best": {
+    "unigram": true,
+    "placeWeight": 1,
+    "alpha": 1,
+    "minDocs": 3,
+    "threshold": 0.9,
+    "mode": "fallback"
+  },
+  "cvF1": 0.872,
+  "rulesOnlyCvF1": 0.844,
+  "bestOfMode": {
+    "model": {
+      "unigram": true,
+      "placeWeight": 0.3,
+      "alpha": 0.1,
+      "minDocs": 2,
+      "threshold": 0.6,
+      "mode": "model",
+      "f1": 0.667
+    },
+    "union": {
+      "unigram": true,
+      "placeWeight": 1,
+      "alpha": 1,
+      "minDocs": 1,
+      "threshold": 0.9,
+      "mode": "union",
+      "f1": 0.862
+    },
+    "fallback": {
+      "unigram": true,
+      "placeWeight": 1,
+      "alpha": 1,
+      "minDocs": 3,
+      "threshold": 0.9,
+      "mode": "fallback",
+      "f1": 0.872
+    }
+  }
+}

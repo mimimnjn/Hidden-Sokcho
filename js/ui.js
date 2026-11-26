@@ -142,6 +142,16 @@ if (!reduceMotion) {
   window.addEventListener("resize", queueReveal);
 }
 
+// 윗줄: 바다 장면 위에서는 투명, 조금(24px) 내리면 종이색으로 채움. 움직임을 끈 사람에게도 똑같이
+const overTopbar = document.querySelector(".topbar.over-scene");
+function syncTopbar() {
+  if (overTopbar) overTopbar.classList.toggle("solid", window.scrollY > 24);
+}
+if (overTopbar) {
+  window.addEventListener("scroll", syncTopbar, { passive: true });
+  syncTopbar();
+}
+
 function watchReveal(root = document) {
   if (reduceMotion) {
     root.querySelectorAll(".reveal, .stagger").forEach((el) => el.classList.add("in"));

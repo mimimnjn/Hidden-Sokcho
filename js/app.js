@@ -110,14 +110,11 @@ function hotHtml(byId, dateValue) {
   const hot = hotRestaurants([...byId.values()], HOT_SIZE, 1).map((item) => ({ item, count: item.buzz, menu: hotMenu(item.place) }));
   const pages = Math.ceil(hot.length / HOT_PAGE);
   const queue = pick(POPULAR.queue);
-  // 조사 날짜: 순위에 나온 곳들을 센 날 (여러 날이면 범위로)
-  const days = [...new Set(hot.map((h) => SNS_DATA.byId[h.item.place.id].measuredOn))].sort().map((d) => formatYmd(d.replace(/-/g, "")));
-  const measured = days.length > 1 ? `${days[0]}~${days[days.length - 1].replace(/^\d+월 /, "")}` : days[0];
+  // 제목 아래 조사 날짜 줄은 뺐음 (2026-11-26 "아래에 회색 텍스트 그건 없애줘"). 조사 날짜는 장소 상세 SNS 칸에 남아 있음
   return `
     <section class="sec sec-foam" aria-labelledby="hot-title">
       <div class="section-head reveal">
-        <h2 id="hot-title" class="section-title">요즘 SNS 바이럴 맛집</h2>
-        <p class="section-sub">SNS 게시물 수 · ${measured} 조사</p>
+        <h2 id="hot-title" class="section-title">요즘 핫한 SNS 바이럴 맛집</h2>
       </div>
       <div class="split">
         <div class="hot-wrap">
@@ -181,7 +178,7 @@ function boardEmptyHtml(all) {
   if (!all.some((i) => i.crowd.level)) return `<p class="board-empty">이날은 혼잡 예측이 없는 날</p>`;
   const busy = all.filter((i) => i.crowd.level === 3 && i.pop.percentile >= POPULAR_MID).map((i) => shortName(i.place.name));
   const line = busy.length
-    ? `${escapeHtml(busy.slice(0, 3).join(" · "))} 이날 사람 많음<br>같은 취향으로 덜 붐비는 곳은 이날 없음`
+    ? `${escapeHtml(busy.slice(0, 3).join(" · "))} 이날 사람 많음<br>같은 취향에 사람 적은 곳은 이날 없음`
     : `${formatYmd(toYmd(state.date))}은 어디든 한산`;
   const next = nextBusyDate(state.date);
   const jump = next ? `<button type="button" class="board-jump" data-jump-date="${toDateInput(next)}">사람 몰리는 날 보기 · ${formatYmd(toYmd(next))}</button>` : "";
@@ -191,22 +188,20 @@ function boardEmptyHtml(all) {
 function boardHtml(all, dateValue) {
   const rows = crowdBoard(all, 4, state.date);
   const day = formatYmd(toYmd(state.date));
+  // 카드 하나에 짝 하나: 위 작은 줄은 사람 몰리는 곳(혼잡 예측 막대·숫자), 점선 아래 큰 글씨는 대신 갈 곳
+  // 넓은 화면에서는 바다 수평선에 걸쳐 한 번 올라옴 (css .board .stagger)
   const body = rows.length
-    ? `<ol class="swaps stagger">${rows.map(({ busy, alt }) => `
+    ? `<ol class="swaps stagger${rows.length === 1 ? " n1" : ""}" style="--n:${rows.length}">${rows.map(({ busy, alt }) => `
         <li class="swap">
           <a class="swap-busy" href="${placeHref(busy.place, dateValue)}">
-            <span class="swap-flag">사람 몰림</span>
-            <span class="swap-busy-name"><strong>${escapeHtml(shortName(busy.place.name))}</strong><span class="num" data-count="${busy.crowd.rate}">${busy.crowd.rate}</span></span>
-            <span class="swap-meter" aria-hidden="true"><span style="width:${busy.crowd.rate}%"></span></span>
+            <span class="swap-busy-name"><strong>${escapeHtml(shortName(busy.place.name))}</strong><span class="swap-flag">사람 몰림</span></span>
+            <span class="swap-busy-rate"><span class="swap-meter" aria-hidden="true"><span style="width:${busy.crowd.rate}%"></span></span><span class="num" data-count="${busy.crowd.rate}">${busy.crowd.rate}</span></span>
           </a>
-          <span class="swap-arrow"><span class="sr-only">대신</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
           <a class="swap-alt" href="${placeHref(alt.place, dateValue)}">
-            <span class="swap-body">
-              <span class="swap-tags"><span class="card-eyebrow">대신 여기 · ${escapeHtml(alt.place.tags.map(tagShort).join(" · "))}</span>${alt.gem ? gemBadgeHtml() : ""}</span>
-              <strong class="card-title">${escapeHtml(shortName(alt.place.name))}</strong>
-              ${placeSummary(alt.place) ? `<span class="card-hook">${escapeHtml(placeSummary(alt.place))}</span>` : ""}
-              <span class="swap-rate">${crowdBadgeHtml(alt.crowd)}</span>
-            </span>
+            <span class="swap-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M7 4v8a4 4 0 0 0 4 4h8M15 12l4 4-4 4"/></svg>대신 여기</span>
+            <strong class="card-title">${escapeHtml(shortName(alt.place.name))}</strong>
+            ${placeSummary(alt.place) ? `<span class="card-hook">${escapeHtml(placeSummary(alt.place))}</span>` : ""}
+            <span class="swap-tags"><span class="tag-text">${escapeHtml(alt.place.tags.map(tagShort).join(" · "))}</span>${alt.gem ? gemBadgeHtml() : ""}${crowdBadgeHtml(alt.crowd)}</span>
           </a>
         </li>`).join("")}</ol>`
     : boardEmptyHtml(all);
@@ -375,6 +370,7 @@ function render() {
   if (!filtering) { state.onlyGems = false; state.mood = { ...NO_MOOD }; }
   els.home.hidden = filtering;
   els.results.hidden = !filtering;
+  document.body.classList.toggle("view-results", filtering); // 목록 화면에서는 바다 꼬리를 줄임 (css .view-results)
   if (filtering) renderResults();
   else renderHome();
   renderStats();
@@ -399,8 +395,9 @@ function renderStats() {
   const known = all.filter((i) => i.crowd.level).length;
   const gems = homeGems(all).length; // 아래 "숨은 명소 N곳"과 같은 수
   const day = formatYmd(toYmd(state.date));
+  // 제목 아래 한 줄: 숫자 → 이름(+ 넓은 화면에서만 작은 설명)
   const stat = (cls, n, title, sub, unit = "") => `
-    <div class="stat ${cls}"><span class="stat-label"><strong>${title}</strong><span>${sub}</span></span><span class="num"><span data-count="${n}">${n}</span>${unit ? `<small>${unit}</small>` : ""}</span></div>`;
+    <div class="stat ${cls}"><span class="num"><span data-count="${n}">${n}</span>${unit ? `<small>${unit}</small>` : ""}</span><span class="stat-label"><strong>${title}</strong><span>${sub}</span></span></div>`;
   const box = document.getElementById("hero-stats");
   box.innerHTML =
     stat("stat-busy", busy, "핫플레이스", `${day} 혼잡 예측 ${known}곳 중`) +
