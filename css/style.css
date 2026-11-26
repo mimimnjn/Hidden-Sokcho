@@ -119,7 +119,8 @@ a:hover { color: var(--signal); }
 
 /* 그날의 숫자: 제목 아래 한 줄 (상자·선 없이 숫자와 이름만) */
 .hero-stats { display: flex; flex-wrap: wrap; gap: 14px 36px; margin-top: 28px; }
-.stat { display: flex; align-items: baseline; gap: 10px; }
+/* 숫자와 오른쪽 두 줄(이름 · 설명)을 세로 가운데로 맞춤. 첫 줄 기준이면 숫자가 떠 보였음 (2026-11-26) */
+.stat { display: flex; align-items: center; gap: 10px; }
 .stat .num { font-size: clamp(34px, 3.2vw, 46px); text-shadow: 0 1px 14px rgba(8, 20, 60, 0.45); }
 .stat .num small { font-family: var(--body); font-size: 15px; font-weight: 700; margin-left: 3px; }
 .stat-busy .num { color: var(--signal-light); } /* 바다 위 빨강은 잘 안 읽혀서 빨강을 밝힌 것 */
@@ -287,12 +288,9 @@ a:hover { color: var(--signal); }
   max-width: 860px; padding: 26px 28px; border-radius: var(--radius); background: var(--paper); box-shadow: var(--shadow-card);
 }
 .board-calm .board-empty { color: var(--ink); font-weight: 700; line-height: 1.5; }
-.board-jump {
-  height: 44px; padding: 0 21px; border: 0; border-radius: 999px; background: var(--hull); color: var(--paper);
-  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s;
-}
-.board-jump:hover { background: var(--ink); }
-.board-jump:active { transform: translateY(1px); }
+/* 날짜만 군청으로 (하늘색은 밝은 바탕에서 안 읽혀서 군청, 2026-11-26) */
+.board-date { color: var(--hull); }
+.calm-narrow { display: none; }
 
 /* ── 요즘 핫한 SNS 바이럴 맛집 ── */
 .hot-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; align-content: start; }
@@ -583,7 +581,7 @@ html:not(.motion) .hot-bar::after { transform: none; }
   .hero-title { font-size: clamp(64px, 19vw, 96px); }
   .hero-lead { margin-top: 14px; font-size: 17px; }
   .hero-stats { gap: 10px 22px; margin-top: 22px; }
-  .stat { gap: 6px; }
+  .stat { gap: 6px; align-items: baseline; } /* 폰은 설명이 숨어 한 줄이라 글자 밑선 기준 */
   .stat .num { font-size: 30px; }
   .stat-label strong { font-size: 13px; }
   .stat-label span { display: none; } /* 숫자 옆 설명은 폰에서 숨김 */
@@ -599,6 +597,8 @@ html:not(.motion) .hot-bar::after { transform: none; }
   .dstat .num { font-size: 36px; }
   .dstat-word { font-size: 17px; }
   .board-calm { padding: 22px; }
+  .calm-wide { display: none; } /* 폰: "11월 26일," 다음 줄 "속초는 어디든 한적해요!" */
+  .calm-narrow { display: inline; }
   .panel { padding: 22px; }
   .hero-number { font-size: 80px; }
   .detail-head, .summary-head { padding-top: 76px; padding-bottom: 36px; }

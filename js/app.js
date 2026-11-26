@@ -164,25 +164,16 @@ function showHotPage(p) {
 // 이 앱의 핵심 장면: 그날 사람 몰리는 곳 → 대신 갈 곳
 // 장소 사진은 화질이 제각각이라 첫 화면에서 뺌. 혼잡을 점의 밀도로 보여 줌
 // 몰리는 곳은 빽빽하게 떨리는 빨간 점, 대신 갈 곳은 듬성하게 숨 쉬는 파란 점
-// 고른 날 다음으로 "사람 몰림 → 대신 여기" 짝이 있는 가장 가까운 날 (예측 기간 안). 없으면 null
-function nextBusyDate(from) {
-  const end = CROWD_DATA.forecastRange[1];
-  for (let d = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1); toYmd(d) <= end; d.setDate(d.getDate() + 1)) {
-    if (crowdBoard(recommend(ALL_PLACES, [], "gem", d), 1, d).length) return new Date(d);
-  }
-  return null;
-}
-
-// 짝이 없는 날: 한 줄로 이유를 말하고, 가장 가까운 사람 몰리는 날로 바로 가는 버튼 (빈 칸만 남지 않게, 2026-11-24)
+// 짝이 없는 날: 한 줄로 이유를 말함 (빈 칸만 남지 않게, 2026-11-24)
+// "사람 몰리는 날 보기" 버튼은 뺌 ("굳이 없어도 된다고 본다", 2026-11-26)
 function boardEmptyHtml(all) {
   if (!all.some((i) => i.crowd.level)) return `<p class="board-empty">이날은 혼잡 예측이 없는 날</p>`;
   const busy = all.filter((i) => i.crowd.level === 3 && i.pop.percentile >= POPULAR_MID).map((i) => shortName(i.place.name));
   const line = busy.length
     ? `${escapeHtml(busy.slice(0, 3).join(" · "))} 이날 사람 많음<br>같은 취향에 사람 적은 곳은 이날 없음`
-    : `${formatYmd(toYmd(state.date))}은 어디든 한산`;
-  const next = nextBusyDate(state.date);
-  const jump = next ? `<button type="button" class="board-jump" data-jump-date="${toDateInput(next)}">사람 몰리는 날 보기 · ${formatYmd(toYmd(next))}</button>` : "";
-  return `<div class="board-calm"><p class="board-empty">${line}</p>${jump}</div>`;
+    // 넓은 화면 한 줄 "11월 26일의 속초는…" · 폰 두 줄 "11월 26일, / 속초는…" (한 줄이면 중간에서 잘려 보여서)
+    : `<span class="board-date">${formatYmd(toYmd(state.date))}</span><span class="calm-wide">의 </span><span class="calm-narrow">,<br></span>속초는 어디든 한적해요!`;
+  return `<div class="board-calm"><p class="board-empty">${line}</p></div>`;
 }
 
 function boardHtml(all, dateValue) {
@@ -431,13 +422,6 @@ els.home.addEventListener("click", (e) => {
     const all = els.home.querySelector("[data-tag-all]");
     all.dataset.tagAll = state.tasteTab;
     all.textContent = `${tagLabel(state.tasteTab)} 다 보기`;
-    return;
-  }
-  const jump = e.target.closest("[data-jump-date]");
-  if (jump) {
-    state.date = parseDateInput(jump.dataset.jumpDate);
-    els.date.value = jump.dataset.jumpDate;
-    render();
     return;
   }
   const tagAll = e.target.closest("[data-tag-all]");
